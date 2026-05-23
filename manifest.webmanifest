@@ -1,0 +1,19 @@
+{
+  "name": "MQTT Rotary Touch Pad",
+  "short_name": "Mouse Pad",
+  "description": "Fullscreen landscape MQTT touch pad for controlling a PC mouse.",
+  "start_url": "./rotary_knob_touch_ui.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#070809",
+  "theme_color": "#070809",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
