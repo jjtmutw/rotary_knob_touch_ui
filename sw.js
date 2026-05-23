@@ -1,7 +1,7 @@
-const CACHE_NAME = 'mqtt-rotary-touch-pad-v5';
+const CACHE_NAME = 'mouse-pad-ui-v6';
 const APP_SHELL = [
   './',
-  './rotary_knob_touch_ui.html',
+  './mouse_pad_ui.html',
   './manifest.webmanifest',
   './icons/icon.svg'
 ];
