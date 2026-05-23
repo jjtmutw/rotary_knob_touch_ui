@@ -13,6 +13,7 @@
   <link rel="apple-touch-icon" href="./icons/icon.svg" />
   <title>Mouse Pad UI</title>
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="./mouse_pad_config.js"></script>
   <style>
     :root {
       --cyan: #12d9ff;
@@ -244,6 +245,7 @@
     let padStartX = 0;
     let padStartY = 0;
 
+    applyConfig();
     applyUrlParams();
 
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
@@ -257,6 +259,12 @@
       if (!broker) return '';
       if (broker.toLowerCase().startsWith('ws://') || broker.toLowerCase().startsWith('wss://')) return broker;
       return 'wss://' + broker;
+    }
+
+    function applyConfig() {
+      const mqttConfig = (window.MOUSE_PAD_CONFIG && window.MOUSE_PAD_CONFIG.mqtt) || {};
+      if (mqttConfig.websocketUrl) brokerInput.value = normalizeBroker(mqttConfig.websocketUrl);
+      if (mqttConfig.topic) topicInput.value = mqttConfig.topic.trim();
     }
 
     function applyUrlParams() {
