@@ -1,7 +1,8 @@
-const CACHE_NAME = 'mouse-pad-ui-v6';
+const CACHE_NAME = 'mouse-pad-ui-v7';
 const APP_SHELL = [
   './',
   './mouse_pad_ui.html',
+  './mouse_pad_config.js',
   './manifest.webmanifest',
   './icons/icon.svg'
 ];
