@@ -40,7 +40,7 @@ def on_message(client, userdata, msg):
             pyautogui.click(button=button)
 
     elif cmd_type == "scroll":
-        dy = limit(data.get("dy", 0), -10, 10)
+        dy = limit(data.get("dy", 0), -400, 400)
         pyautogui.scroll(dy)
 
     elif cmd_type == "page":
