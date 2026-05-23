@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mouse-pad-ui-v10';
+const CACHE_NAME = 'mouse-pad-ui-v11';
 const APP_SHELL = [
   './',
   './mouse_pad_ui.html',
