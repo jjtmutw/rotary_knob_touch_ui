@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#070809" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Mouse Pad" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/icon.svg" />
   <title>MQTT Rotary Touch Pad</title>
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
   <style>
@@ -23,9 +31,17 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      overscroll-behavior: none;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100dvh;
       display: grid;
       place-items: center;
       overflow: hidden;
@@ -474,6 +490,28 @@
       .settings-card { grid-template-columns: 1fr; }
       .meter { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
+
+    @media (orientation: landscape) and (max-height: 620px) {
+      body {
+        place-items: stretch;
+        overflow: hidden;
+      }
+
+      .console {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-height: none;
+        min-height: 0;
+        aspect-ratio: auto;
+        border-radius: 0;
+        padding:
+          max(10px, env(safe-area-inset-top))
+          max(12px, env(safe-area-inset-right))
+          max(10px, env(safe-area-inset-bottom))
+          max(12px, env(safe-area-inset-left));
+      }
+    }
   </style>
 </head>
 <body>
@@ -493,7 +531,7 @@
 
       <div class="click-scroll-row">
         <button class="btn" id="leftClickBtn">左鍵 Click</button>
-        <div class="scroll-wheel" id="scrollWheel" aria-label="上下滑動滾輪區">
+        <div class="scroll-wheel" id="scrollWheel" aria-label="捲動滾輪">
           <div class="scroll-thumb" id="scrollThumb"></div>
         </div>
         <button class="btn" id="rightClickBtn">右鍵 Click</button>
@@ -504,7 +542,7 @@
       <div class="card top-card">
         <div class="title">
           <h1>PJJ Mouse Pad</h1>
-          <p>觸控滑動 → MQTT → 電腦端滑鼠控制</p>
+          <p>透過 MQTT 將觸控操作送到電腦滑鼠接收器</p>
         </div>
         <div class="status" id="status"><span class="dot"></span><span id="statusText">MQTT 未連線</span></div>
       </div>
@@ -527,11 +565,11 @@
 
         <div class="range-stack">
           <div>
-            <label>滑鼠速度倍率：<span id="speedText">1.6</span>x</label>
+            <label>滑鼠速度：<span id="speedText">1.6</span>x</label>
             <input id="speedRange" type="range" min="0.4" max="5" step="0.1" value="1.6" />
           </div>
           <div>
-            <label>送出頻率 ms：<span id="rateText">35</span></label>
+            <label>送出間隔：<span id="rateText">35</span> ms</label>
             <input id="rateRange" type="range" min="20" max="120" step="5" value="35" />
           </div>
         </div>
@@ -579,6 +617,34 @@
     let lastScrollY = 0;
     let lastScrollSend = 0;
     let scrollVisualOffset = 0;
+    let immersiveRequested = false;
+
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(error => log('Service worker error: ' + error.message));
+      });
+    }
+
+    async function enterImmersiveMode() {
+      if (immersiveRequested) return;
+      immersiveRequested = true;
+
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+        }
+      } catch (error) {
+        log('Fullscreen skipped: ' + error.message);
+      }
+
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape');
+        }
+      } catch (error) {
+        log('Orientation lock skipped: ' + error.message);
+      }
+    }
 
     function log(msg) {
       const now = new Date().toLocaleTimeString();
@@ -600,7 +666,7 @@
       payload.ts = Date.now();
 
       if (!client || !connected) {
-        log('尚未連線：' + JSON.stringify(payload));
+        log('尚未連線，略過送出：' + JSON.stringify(payload));
         return;
       }
 
@@ -610,6 +676,7 @@
     }
 
     function connectMQTT() {
+      enterImmersiveMode();
       const url = brokerInput.value.trim();
       if (!url) return;
 
@@ -618,7 +685,7 @@
       }
 
       setStatus(false, 'MQTT 連線中...');
-      log('連線到 ' + url);
+      log('Connecting to ' + url);
 
       client = mqtt.connect(url, {
         clientId: 'JJ_MousePad_' + Math.random().toString(16).slice(2),
@@ -629,7 +696,7 @@
 
       client.on('connect', () => {
         setStatus(true, 'MQTT 已連線');
-        log('MQTT connected，topic=' + getTopic());
+        log('MQTT connected, topic=' + getTopic());
         publish({ type: 'hello', target: 'pc_mouse' });
       });
 
@@ -642,7 +709,7 @@
       if (client) client.end(true);
       client = null;
       setStatus(false, 'MQTT 已斷線');
-      log('手動斷線');
+      log('Disconnected');
     }
 
     function clamp(n, min, max) {
@@ -701,6 +768,7 @@
     }
 
     pad.addEventListener('pointerdown', event => {
+      enterImmersiveMode();
       dragging = true;
       pad.classList.add('dragging');
       pad.setPointerCapture(event.pointerId);
@@ -735,10 +803,17 @@
       if (dragging) stopPad();
     });
 
-    document.getElementById('leftClickBtn').addEventListener('click', () => publish({ type: 'click', target: 'pc_mouse', button: 'left' }));
-    document.getElementById('rightClickBtn').addEventListener('click', () => publish({ type: 'click', target: 'pc_mouse', button: 'right' }));
+    document.getElementById('leftClickBtn').addEventListener('click', () => {
+      enterImmersiveMode();
+      publish({ type: 'click', target: 'pc_mouse', button: 'left' });
+    });
+    document.getElementById('rightClickBtn').addEventListener('click', () => {
+      enterImmersiveMode();
+      publish({ type: 'click', target: 'pc_mouse', button: 'right' });
+    });
 
     scrollWheel.addEventListener('pointerdown', event => {
+      enterImmersiveMode();
       scrollDragging = true;
       scrollWheel.classList.add('scrolling');
       scrollWheel.setPointerCapture(event.pointerId);
@@ -779,7 +854,7 @@
 
     setStatus(false, 'MQTT 未連線');
     log('Device ID: ' + DEVICE_ID);
-    log('請按「連線」後，在 Pad 上滑動控制滑鼠。');
+    log('Ready. Install as PWA for fullscreen landscape mode.');
   </script>
 </body>
 </html>
