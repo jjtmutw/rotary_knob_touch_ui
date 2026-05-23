@@ -4,6 +4,8 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $patchDir = Join-Path $root "_pyinstaller_local_patch"
 $cacheDir = Join-Path $root ".pyinstaller-cache"
 $siteCustomize = Join-Path $patchDir "sitecustomize.py"
+$venvDir = Join-Path $root ".venv"
+$pythonExe = Join-Path $venvDir "Scripts\python.exe"
 
 New-Item -ItemType Directory -Force $patchDir | Out-Null
 New-Item -ItemType Directory -Force $cacheDir | Out-Null
@@ -27,6 +29,11 @@ sys.modules["PyInstaller.utils.hooks.tcl_tk"] = fake_tcl_tk
 $env:PYTHONPATH = $patchDir
 $env:PYINSTALLER_CONFIG_DIR = $cacheDir
 
-python -m PyInstaller (Join-Path $root "rotary_PC.spec") --noconfirm
+if (-not (Test-Path $pythonExe)) {
+  python -m venv $venvDir
+}
+
+& $pythonExe -m pip install --disable-pip-version-check --no-cache-dir --no-build-isolation -r (Join-Path $root "requirements.txt") pyinstaller==5.10.1
+& $pythonExe -m PyInstaller (Join-Path $root "rotary_PC.spec") --noconfirm
 
 Write-Host "Built dist\rotary_PC.exe"
