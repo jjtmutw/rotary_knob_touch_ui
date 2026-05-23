@@ -9,16 +9,17 @@ A touch-friendly browser control panel that publishes MQTT mouse commands, plus 
 
 ## Run the Receiver
 
-Install dependencies:
+Create a local virtual environment and install dependencies:
 
 ```bash
-pip install paho-mqtt pyautogui
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 Start the receiver:
 
 ```bash
-python rotary_PC.py
+.\.venv\Scripts\python.exe rotary_PC.py
 ```
 
 Then open `rotary_knob_touch_ui.html` in a browser and use the touch controls.
