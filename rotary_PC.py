@@ -10,7 +10,7 @@ TOPIC = "JJ/mouse/pad/cmd"
 
 pyautogui.FAILSAFE = True
 
-def limit(v, min_v=-80, max_v=80):
+def limit(v, min_v=-800, max_v=800):
     return max(min_v, min(max_v, int(v)))
 
 def on_connect(client, userdata, flags, reason_code, properties=None):
