@@ -43,6 +43,13 @@ def on_message(client, userdata, msg):
         dy = limit(data.get("dy", 0), -10, 10)
         pyautogui.scroll(dy)
 
+    elif cmd_type == "page":
+        direction = data.get("direction")
+        if direction == "up":
+            pyautogui.press("pageup")
+        elif direction == "down":
+            pyautogui.press("pagedown")
+
     elif cmd_type == "stop":
         pass
 
