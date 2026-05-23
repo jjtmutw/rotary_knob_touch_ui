@@ -21,8 +21,9 @@
       --green: #40ff9d;
       --red: #ff5f73;
       --text: #e7f7ff;
-      --muted: rgba(231, 247, 255, .58);
+      --muted: rgba(231, 247, 255, .62);
       --panel: #17191c;
+      --line: rgba(255,255,255,.10);
       --x: 50%;
       --y: 50%;
     }
@@ -36,22 +37,17 @@
       height: min(100dvh, calc(100vw * 9 / 16));
       min-width: 0;
       min-height: 0;
-      display: grid;
-      place-items: stretch;
       background: #000;
     }
 
     .console {
       width: 100%;
       height: 100%;
-      padding: clamp(8px, 1.25vw, 20px);
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(74px, 1fr) minmax(0, 4fr);
-      gap: clamp(8px, 1vw, 16px);
-      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.09), transparent 28%), linear-gradient(145deg, #34383c, var(--panel) 68%);
-      box-shadow: inset 0 1px 2px rgba(255,255,255,.16), inset 0 -32px 60px rgba(0,0,0,.35);
+      padding: clamp(8px, 1.2vw, 18px);
       position: relative;
       overflow: hidden;
+      background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.09), transparent 28%), linear-gradient(145deg, #34383c, var(--panel) 68%);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.16), inset 0 -32px 60px rgba(0,0,0,.35);
     }
 
     .console::before {
@@ -64,60 +60,67 @@
       box-shadow: inset 0 0 50px rgba(0,0,0,.35);
     }
 
-    .settings-zone, .wheel-zone, .pad-zone {
+    .page {
       position: relative;
       z-index: 2;
+      width: 100%;
+      height: 100%;
       min-width: 0;
       min-height: 0;
-      display: grid;
+      display: none;
       gap: clamp(8px, 1vw, 14px);
     }
+    .page.active { display: grid; }
 
-    .settings-zone { grid-template-rows: auto minmax(0, 1fr) auto; }
-    .wheel-zone { grid-template-rows: 1fr minmax(0, 1.8fr) 1fr; }
-    .pad-zone { grid-template-rows: minmax(0, 1fr) clamp(54px, 9.5dvh, 78px); }
+    .settings-page { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+    .control-page { grid-template-columns: minmax(0, 1.35fr) minmax(190px, .65fr); }
 
-    .card {
-      padding: clamp(8px, 1vw, 14px);
+    .panel {
+      min-width: 0;
+      min-height: 0;
+      padding: clamp(9px, 1vw, 14px);
       border-radius: clamp(14px, 1.8vw, 22px);
       background: linear-gradient(145deg, rgba(255,255,255,.06), rgba(0,0,0,.22));
       border: 1px solid rgba(255,255,255,.07);
       box-shadow: inset 0 1px 2px rgba(255,255,255,.08), 0 9px 22px rgba(0,0,0,.22);
-      min-width: 0;
-      min-height: 0;
+      display: grid;
+      overflow: hidden;
     }
 
-    .title-card { display: grid; gap: 8px; }
-    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    h1 { margin: 0; font-size: clamp(18px, 2.2vw, 30px); line-height: 1.05; letter-spacing: .05em; }
+    .settings-main { grid-template-rows: auto minmax(0, 1fr) auto; gap: clamp(8px, 1vw, 14px); }
+    .settings-form { display: grid; align-content: center; gap: clamp(8px, .9vw, 12px); }
+    .settings-side { grid-template-rows: auto 1fr auto; gap: clamp(8px, 1vw, 14px); }
+    .control-main { grid-template-rows: minmax(0, 1fr) clamp(56px, 10dvh, 82px); gap: clamp(8px, 1vw, 14px); }
+    .control-side { grid-template-rows: auto minmax(0, 1fr) auto; gap: clamp(8px, 1vw, 14px); }
+
+    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+    h1, h2 { margin: 0; line-height: 1.05; letter-spacing: .04em; }
+    h1 { font-size: clamp(20px, 2.6vw, 38px); }
+    h2 { font-size: clamp(15px, 1.55vw, 22px); color: rgba(231,247,255,.86); }
+    .hint { margin: 0; color: var(--muted); font-size: clamp(11px, 1vw, 14px); line-height: 1.45; }
 
     .status { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border-radius: 999px; background: linear-gradient(145deg, #2b3034, #111316); box-shadow: inset 0 1px 2px rgba(255,255,255,.14), inset 0 -5px 9px rgba(0,0,0,.45), 0 9px 22px rgba(0,0,0,.25); color: var(--muted); font-size: clamp(10px, 1vw, 13px); white-space: nowrap; }
     .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); box-shadow: 0 0 10px rgba(255,95,115,.7); }
     .connected .dot { background: var(--green); box-shadow: 0 0 12px rgba(64,255,157,.85); }
 
-    .settings-card { display: grid; align-content: start; gap: clamp(8px, .9vw, 12px); overflow: hidden; }
     .field { min-width: 0; }
     label { display: block; margin: 0 0 5px; font-size: clamp(9px, .82vw, 11px); color: var(--muted); letter-spacing: .06em; }
     input, button { font: inherit; }
-    input[type="text"] { width: 100%; min-height: clamp(30px, 5.1dvh, 39px); padding: 7px 10px; border: 1px solid rgba(255,255,255,.10); border-radius: 13px; outline: none; color: var(--text); background: rgba(0,0,0,.30); box-shadow: inset 0 1px 6px rgba(0,0,0,.35); font-size: clamp(11px, 1vw, 14px); }
+    input[type="text"] { width: 100%; min-height: clamp(32px, 5.3dvh, 42px); padding: 7px 10px; border: 1px solid var(--line); border-radius: 13px; outline: none; color: var(--text); background: rgba(0,0,0,.30); box-shadow: inset 0 1px 6px rgba(0,0,0,.35); font-size: clamp(11px, 1vw, 14px); }
     input[type="range"] { width: 100%; accent-color: var(--cyan); }
     .range-value { color: var(--cyan); font-weight: 800; }
-    .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    .btn { min-width: 0; min-height: 0; border: 0; border-radius: clamp(12px, 1.5vw, 18px); color: var(--text); background: linear-gradient(145deg, #364047, #101315); box-shadow: inset 0 1px 2px rgba(255,255,255,.14), inset 0 -5px 9px rgba(0,0,0,.55), 0 9px 18px rgba(0,0,0,.28); cursor: pointer; font-size: clamp(12px, 1.35vw, 17px); font-weight: 800; letter-spacing: .04em; }
+    .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 0; }
+    .button-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; min-height: 0; }
+    .utility-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: stretch; }
+
+    .btn { min-width: 0; min-height: 0; border: 0; border-radius: clamp(12px, 1.5vw, 18px); color: var(--text); background: linear-gradient(145deg, #364047, #101315); box-shadow: inset 0 1px 2px rgba(255,255,255,.14), inset 0 -5px 9px rgba(0,0,0,.55), 0 9px 18px rgba(0,0,0,.28); cursor: pointer; font-size: clamp(11px, 1.15vw, 16px); font-weight: 800; letter-spacing: .03em; padding: 8px 10px; }
     .btn.primary { color: #06232a; background: linear-gradient(180deg, #b8f7ff, var(--cyan)); box-shadow: 0 0 22px var(--cyan-soft), inset 0 1px 1px rgba(255,255,255,.75); }
-    .btn.page { width: 100%; height: 100%; font-size: clamp(13px, 1.55vw, 19px); }
+    .btn.danger { color: #ffdfe4; background: linear-gradient(145deg, #63313a, #171013); }
     .btn:active { transform: translateY(1px); }
 
-    .wheel-card { border-radius: clamp(16px, 2vw, 26px); position: relative; overflow: hidden; touch-action: none; cursor: ns-resize; background: linear-gradient(90deg, transparent 0 23%, rgba(255,255,255,.08) 24% 26%, transparent 27% 73%, rgba(255,255,255,.08) 74% 76%, transparent 77% 100%), repeating-linear-gradient(180deg, rgba(18,217,255,.24) 0 2px, transparent 2px 12px), linear-gradient(145deg, #30363b, #101315); border: 1px solid rgba(255,255,255,.10); box-shadow: inset 0 1px 2px rgba(255,255,255,.14), inset 0 -8px 16px rgba(0,0,0,.62), 0 9px 18px rgba(0,0,0,.28); }
-    .wheel-card::before, .wheel-card::after { position: absolute; left: 50%; transform: translateX(-50%); color: rgba(231,247,255,.60); font-size: clamp(8px, .8vw, 12px); letter-spacing: .12em; pointer-events: none; white-space: nowrap; }
-    .wheel-card::before { content: "SCROLL UP"; top: 8px; }
-    .wheel-card::after { content: "SCROLL DOWN"; bottom: 8px; }
-    .scroll-thumb { position: absolute; left: 50%; top: 50%; width: 58%; height: clamp(16px, 3dvh, 28px); transform: translate(-50%, -50%); border-radius: 999px; background: linear-gradient(180deg, #b8f7ff, var(--cyan)); box-shadow: 0 0 14px var(--cyan-soft), inset 0 1px 1px rgba(255,255,255,.8), inset 0 -4px 8px rgba(0,0,0,.25); pointer-events: none; transition: transform .12s ease; }
-    .wheel-card.scrolling .scroll-thumb { box-shadow: 0 0 24px rgba(18,217,255,.58), inset 0 1px 1px rgba(255,255,255,.8), inset 0 -4px 8px rgba(0,0,0,.25); }
-
     .pad-wrap { min-width: 0; min-height: 0; display: grid; place-items: center; }
-    .touch-pad { width: min(100%, 100cqh); height: min(100%, 100cqw); aspect-ratio: 1; border-radius: clamp(18px, 3.4vw, 50px); position: relative; overflow: hidden; touch-action: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: crosshair; background: radial-gradient(circle at var(--x) var(--y), rgba(18,217,255,.24), transparent 18%), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,.045) 1px, transparent 1px), radial-gradient(circle at 50% 45%, #30353a, #111418 70%); background-size: auto, clamp(26px, 3.2vw, 38px) clamp(26px, 3.2vw, 38px), clamp(26px, 3.2vw, 38px) clamp(26px, 3.2vw, 38px), auto; box-shadow: inset 0 2px 3px rgba(255,255,255,.16), inset 0 -18px 36px rgba(0,0,0,.65), 0 18px 34px rgba(0,0,0,.42); border: 1px solid rgba(255,255,255,.10); }
+    .touch-pad { width: min(100%, 100cqh); height: min(100%, 100cqw); aspect-ratio: 1; border-radius: clamp(18px, 3.4vw, 50px); position: relative; overflow: hidden; touch-action: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: crosshair; background: radial-gradient(circle at var(--x) var(--y), rgba(18,217,255,.24), transparent 18%), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,.045) 1px, transparent 1px), radial-gradient(circle at 50% 45%, #30353a, #111418 70%); background-size: auto, clamp(26px, 3.2vw, 38px) clamp(26px, 3.2vw, 38px), clamp(26px, 3.2vw, 38px) clamp(26px, 3.2vw, 38px), auto; box-shadow: inset 0 2px 3px rgba(255,255,255,.16), inset 0 -18px 36px rgba(0,0,0,.65), 0 18px 34px rgba(0,0,0,.42); border: 1px solid var(--line); }
     .touch-pad::before { content: ""; position: absolute; inset: clamp(9px, 1.1vw, 14px); border-radius: clamp(14px, 2.7vw, 38px); border: 1px solid rgba(18,217,255,.18); box-shadow: inset 0 0 24px rgba(18,217,255,.07); pointer-events: none; }
     .touch-pad::after, .cross-x { content: ""; position: absolute; pointer-events: none; background: linear-gradient(transparent, rgba(18,217,255,.22), transparent); }
     .touch-pad::after { left: 50%; top: 50%; width: 1px; height: 100%; transform: translate(-50%, -50%); }
@@ -126,84 +129,105 @@
     .dragging .thumb { box-shadow: inset 0 2px 4px rgba(255,255,255,.20), inset 0 -9px 18px rgba(0,0,0,.82), 0 0 0 12px rgba(18,217,255,.10), 0 0 34px rgba(18,217,255,.58), 0 12px 26px rgba(0,0,0,.55); }
     .thumb span { width: 38%; aspect-ratio: 1; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan), 0 0 24px var(--cyan-soft); }
     .vector-line { position: absolute; left: 50%; top: 50%; width: 3px; height: 0; transform-origin: 50% 0; background: linear-gradient(var(--cyan), transparent); border-radius: 99px; box-shadow: 0 0 12px var(--cyan-soft); pointer-events: none; }
-    .corner-label { position: absolute; color: rgba(231,247,255,.36); font-size: clamp(8px, .8vw, 12px); letter-spacing: .09em; text-transform: uppercase; pointer-events: none; }
-    .corner-label.t { top: 18px; left: 50%; transform: translateX(-50%); }
-    .corner-label.b { bottom: 18px; left: 50%; transform: translateX(-50%); }
-    .corner-label.l { left: 18px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
-    .corner-label.r { right: 18px; top: 50%; transform: translateY(-50%) rotate(90deg); }
-    .click-row { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px, 1vw, 14px); min-height: 0; }
+
+    .wheel-strip { display: grid; grid-template-columns: minmax(74px, .7fr) minmax(96px, 1fr) minmax(74px, .7fr); gap: 8px; min-height: 0; }
+    .wheel-card { border-radius: clamp(16px, 2vw, 26px); position: relative; overflow: hidden; touch-action: none; cursor: ns-resize; background: linear-gradient(90deg, transparent 0 23%, rgba(255,255,255,.08) 24% 26%, transparent 27% 73%, rgba(255,255,255,.08) 74% 76%, transparent 77% 100%), repeating-linear-gradient(180deg, rgba(18,217,255,.24) 0 2px, transparent 2px 12px), linear-gradient(145deg, #30363b, #101315); border: 1px solid var(--line); box-shadow: inset 0 1px 2px rgba(255,255,255,.14), inset 0 -8px 16px rgba(0,0,0,.62), 0 9px 18px rgba(0,0,0,.28); }
+    .wheel-card::before, .wheel-card::after { position: absolute; left: 50%; transform: translateX(-50%); color: rgba(231,247,255,.60); font-size: clamp(8px, .8vw, 12px); letter-spacing: .12em; pointer-events: none; white-space: nowrap; }
+    .wheel-card::before { content: "SCROLL UP"; top: 8px; }
+    .wheel-card::after { content: "SCROLL DOWN"; bottom: 8px; }
+    .scroll-thumb { position: absolute; left: 50%; top: 50%; width: 58%; height: clamp(16px, 3dvh, 28px); transform: translate(-50%, -50%); border-radius: 999px; background: linear-gradient(180deg, #b8f7ff, var(--cyan)); box-shadow: 0 0 14px var(--cyan-soft), inset 0 1px 1px rgba(255,255,255,.8), inset 0 -4px 8px rgba(0,0,0,.25); pointer-events: none; transition: transform .12s ease; }
+    .wheel-card.scrolling .scroll-thumb { box-shadow: 0 0 24px rgba(18,217,255,.58), inset 0 1px 1px rgba(255,255,255,.8), inset 0 -4px 8px rgba(0,0,0,.25); }
 
     @media (orientation: portrait) {
       .stage { width: 100vw; height: 100dvh; }
-      .console { grid-template-columns: 1fr; grid-template-rows: auto minmax(160px, .7fr) minmax(0, 1fr); }
-      .settings-zone { grid-template-rows: auto auto; }
-      .wheel-zone { grid-template-columns: 1fr 1.4fr 1fr; grid-template-rows: 72px; }
-      .pad-zone { grid-template-rows: minmax(0, 1fr) 68px; }
+      .settings-page, .control-page { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; }
+      .control-side { grid-template-rows: auto auto auto; }
+      .utility-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
   </style>
 </head>
 <body>
   <div class="stage">
     <main class="console" id="app">
-      <section class="settings-zone">
-        <div class="card title-card">
+      <section class="page settings-page active" id="settingsPage">
+        <div class="panel settings-main">
           <div class="title-row">
             <h1>PJJ Mouse Pad</h1>
-            <div class="status" id="status"><span class="dot"></span><span id="statusText">MQTT 未連線</span></div>
+            <div class="status"><span class="dot"></span><span id="statusText">MQTT 未連線</span></div>
           </div>
-        </div>
-
-        <div class="card settings-card">
-          <div class="field">
-            <label>MQTT WebSocket Broker</label>
-            <input id="brokerInput" type="text" value="wss://broker.emqx.io:8084/mqtt" />
-          </div>
-          <div class="field">
-            <label>Publish Topic</label>
-            <input id="topicInput" type="text" value="JJ/mouse/pad/cmd" />
-          </div>
-          <div class="field">
-            <label>滑鼠速度：<span class="range-value" id="speedText">1.6</span>x</label>
-            <input id="speedRange" type="range" min="0.4" max="10" step="0.1" value="1.6" />
-          </div>
-          <div class="field">
-            <label>送出間隔：<span class="range-value" id="rateText">35</span> ms</label>
-            <input id="rateRange" type="range" min="20" max="60" step="5" value="35" />
-          </div>
-          <div class="field">
-            <label>滾輪速度：<span class="range-value" id="scrollSpeedText">1.0</span>x</label>
-            <input id="scrollSpeedRange" type="range" min="0.5" max="50" step="0.5" value="1.0" />
+          <div class="settings-form">
+            <div class="field">
+              <label>MQTT WebSocket Broker</label>
+              <input id="brokerInput" type="text" value="wss://broker.emqx.io:8084/mqtt" />
+            </div>
+            <div class="field">
+              <label>Publish Topic</label>
+              <input id="topicInput" type="text" value="JJ/mouse/pad/cmd" />
+            </div>
+            <div class="field">
+              <label>滑鼠速度：<span class="range-value" id="speedText">1.6</span>x</label>
+              <input id="speedRange" type="range" min="0.4" max="10" step="0.1" value="1.6" />
+            </div>
+            <div class="field">
+              <label>送出間隔：<span class="range-value" id="rateText">35</span> ms</label>
+              <input id="rateRange" type="range" min="20" max="60" step="5" value="35" />
+            </div>
+            <div class="field">
+              <label>滾輪速度：<span class="range-value" id="scrollSpeedText">1.0</span>x</label>
+              <input id="scrollSpeedRange" type="range" min="0.5" max="50" step="0.5" value="1.0" />
+            </div>
           </div>
           <div class="button-row">
             <button class="btn primary" id="connectBtn">連線</button>
             <button class="btn" id="disconnectBtn">斷線</button>
           </div>
         </div>
-      </section>
 
-      <section class="wheel-zone">
-        <button class="btn page" id="pageUpBtn">上頁</button>
-        <div class="wheel-card" id="scrollWheel" aria-label="上下滑動滾輪">
-          <div class="scroll-thumb" id="scrollThumb"></div>
+        <div class="panel settings-side">
+          <h2>設定頁</h2>
+          <p class="hint">連線與速度設定放在這裡。設定完成後切到操控頁，MQTT 連線會保持在同一個頁面狀態中。</p>
+          <button class="btn primary" id="goControlBtn">前往操控頁</button>
         </div>
-        <button class="btn page" id="pageDownBtn">下頁</button>
       </section>
 
-      <section class="pad-zone">
-        <div class="pad-wrap">
-          <div class="touch-pad" id="pad" aria-label="MQTT 觸控滑鼠板">
-            <div class="cross-x"></div>
-            <div class="vector-line" id="vectorLine"></div>
-            <div class="thumb"><span></span></div>
-            <div class="corner-label t">UP</div>
-            <div class="corner-label b">DOWN</div>
-            <div class="corner-label l">LEFT</div>
-            <div class="corner-label r">RIGHT</div>
+      <section class="page control-page" id="controlPage">
+        <div class="panel control-main">
+          <div class="pad-wrap">
+            <div class="touch-pad" id="pad" aria-label="MQTT 觸控滑鼠板">
+              <div class="cross-x"></div>
+              <div class="vector-line" id="vectorLine"></div>
+              <div class="thumb"><span></span></div>
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="btn" id="leftClickBtn">左鍵</button>
+            <button class="btn" id="rightClickBtn">右鍵</button>
           </div>
         </div>
-        <div class="click-row">
-          <button class="btn" id="leftClickBtn">左鍵</button>
-          <button class="btn" id="rightClickBtn">右鍵</button>
+
+        <div class="panel control-side">
+          <div class="title-row">
+            <h2>操控頁</h2>
+            <button class="btn" id="goSettingsBtn">設定</button>
+          </div>
+          <div class="button-grid utility-grid">
+            <button class="btn" id="pageUpBtn">上頁</button>
+            <button class="btn" id="pageDownBtn">下頁</button>
+            <button class="btn" data-hotkey="window_close">關閉視窗</button>
+            <button class="btn" data-hotkey="window_maximize">放大視窗</button>
+            <button class="btn" data-hotkey="window_minimize">縮小視窗</button>
+            <button class="btn" data-hotkey="tab_switch">切換分頁</button>
+            <button class="btn danger" data-hotkey="tab_close">關閉分頁</button>
+            <button class="btn" data-hotkey="reload">重新整理</button>
+            <button class="btn primary" data-hotkey="tab_new">開新分頁</button>
+          </div>
+          <div class="wheel-strip">
+            <button class="btn" data-hotkey="tab_prev">前分頁</button>
+            <div class="wheel-card" id="scrollWheel" aria-label="上下滑動滾輪">
+              <div class="scroll-thumb" id="scrollThumb"></div>
+            </div>
+            <button class="btn" data-hotkey="tab_switch">後分頁</button>
+          </div>
         </div>
       </section>
     </main>
@@ -211,6 +235,8 @@
 
   <script>
     const app = document.getElementById('app');
+    const settingsPage = document.getElementById('settingsPage');
+    const controlPage = document.getElementById('controlPage');
     const pad = document.getElementById('pad');
     const vectorLine = document.getElementById('vectorLine');
     const statusText = document.getElementById('statusText');
@@ -218,6 +244,8 @@
     const topicInput = document.getElementById('topicInput');
     const connectBtn = document.getElementById('connectBtn');
     const disconnectBtn = document.getElementById('disconnectBtn');
+    const goControlBtn = document.getElementById('goControlBtn');
+    const goSettingsBtn = document.getElementById('goSettingsBtn');
     const speedRange = document.getElementById('speedRange');
     const rateRange = document.getElementById('rateRange');
     const speedText = document.getElementById('speedText');
@@ -252,6 +280,12 @@
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(error => log('Service worker error: ' + error.message));
       });
+    }
+
+    function showPage(name) {
+      settingsPage.classList.toggle('active', name === 'settings');
+      controlPage.classList.toggle('active', name === 'control');
+      enterImmersiveMode();
     }
 
     function normalizeBroker(value) {
@@ -418,6 +452,11 @@
       publish({ type: 'page', target: 'pc_mouse', direction });
     }
 
+    function sendHotkey(action) {
+      enterImmersiveMode();
+      publish({ type: 'hotkey', target: 'pc_mouse', action });
+    }
+
     function isQuickTap(event, startX, startY) {
       return Math.hypot(event.clientX - startX, event.clientY - startY) < 10;
     }
@@ -484,6 +523,9 @@
     document.getElementById('rightClickBtn').addEventListener('click', () => { enterImmersiveMode(); publish({ type: 'click', target: 'pc_mouse', button: 'right' }); });
     pageUpBtn.addEventListener('click', () => sendPage('up'));
     pageDownBtn.addEventListener('click', () => sendPage('down'));
+    document.querySelectorAll('[data-hotkey]').forEach(button => {
+      button.addEventListener('click', () => sendHotkey(button.dataset.hotkey));
+    });
 
     scrollWheel.addEventListener('pointerdown', event => {
       enterImmersiveMode();
@@ -514,6 +556,8 @@
     scrollWheel.addEventListener('lostpointercapture', () => { if (scrollDragging) stopScroll(); });
     scrollWheel.addEventListener('wheel', event => { event.preventDefault(); sendScroll(event.deltaY, true); }, { passive: false });
 
+    goControlBtn.addEventListener('click', () => showPage('control'));
+    goSettingsBtn.addEventListener('click', () => showPage('settings'));
     connectBtn.addEventListener('click', connectMQTT);
     disconnectBtn.addEventListener('click', disconnectMQTT);
     speedRange.addEventListener('input', () => speedText.textContent = speedRange.value);
