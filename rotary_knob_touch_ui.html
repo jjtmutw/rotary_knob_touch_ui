@@ -73,7 +73,7 @@
     }
 
     .settings-zone { grid-template-rows: auto minmax(0, 1fr) auto; }
-    .wheel-zone { grid-template-rows: 1fr minmax(0, 1.8fr) 1fr; }
+    .wheel-zone { grid-template-rows: 1fr minmax(0, 1.75fr) 1fr auto; }
     .pad-zone { grid-template-rows: minmax(0, 1fr) clamp(54px, 9.5dvh, 78px); }
 
     .card {
@@ -89,7 +89,6 @@
     .title-card { display: grid; gap: 8px; }
     .title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     h1 { margin: 0; font-size: clamp(18px, 2.2vw, 30px); line-height: 1.05; letter-spacing: .05em; }
-    .subtitle { margin: 0; color: var(--muted); font-size: clamp(10px, 1vw, 13px); line-height: 1.35; }
 
     .status { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border-radius: 999px; background: linear-gradient(145deg, #2b3034, #111316); box-shadow: inset 0 1px 2px rgba(255,255,255,.14), inset 0 -5px 9px rgba(0,0,0,.45), 0 9px 22px rgba(0,0,0,.25); color: var(--muted); font-size: clamp(10px, 1vw, 13px); white-space: nowrap; }
     .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); box-shadow: 0 0 10px rgba(255,95,115,.7); }
@@ -137,7 +136,8 @@
       .stage { width: 100vw; height: 100dvh; }
       .console { grid-template-columns: 1fr; grid-template-rows: auto minmax(160px, .7fr) minmax(0, 1fr); }
       .settings-zone { grid-template-rows: auto auto; }
-      .wheel-zone { grid-template-columns: 1fr 1.4fr 1fr; grid-template-rows: 72px; }
+      .wheel-zone { grid-template-columns: 1fr 1.4fr 1fr; grid-template-rows: 72px auto; }
+      .wheel-speed-card { grid-column: 1 / -1; }
       .pad-zone { grid-template-rows: minmax(0, 1fr) 68px; }
     }
   </style>
@@ -151,7 +151,6 @@
             <h1>PJJ Mouse Pad</h1>
             <div class="status" id="status"><span class="dot"></span><span id="statusText">MQTT 未連線</span></div>
           </div>
-          <p class="subtitle">透過 MQTT 將觸控、滾輪與翻頁操作送到電腦</p>
         </div>
 
         <div class="card settings-card">
@@ -169,7 +168,7 @@
           </div>
           <div class="field">
             <label>送出間隔：<span class="range-value" id="rateText">35</span> ms</label>
-            <input id="rateRange" type="range" min="20" max="120" step="5" value="35" />
+            <input id="rateRange" type="range" min="20" max="60" step="5" value="35" />
           </div>
           <div class="button-row">
             <button class="btn primary" id="connectBtn">連線</button>
@@ -184,6 +183,10 @@
           <div class="scroll-thumb" id="scrollThumb"></div>
         </div>
         <button class="btn page" id="pageDownBtn">下頁</button>
+        <div class="card wheel-speed-card">
+          <label>滾輪速度：<span class="range-value" id="scrollSpeedText">1.0</span>x</label>
+          <input id="scrollSpeedRange" type="range" min="0.5" max="10" step="0.1" value="1.0" />
+        </div>
       </section>
 
       <section class="pad-zone">
@@ -221,6 +224,8 @@
     const rateText = document.getElementById('rateText');
     const scrollWheel = document.getElementById('scrollWheel');
     const scrollThumb = document.getElementById('scrollThumb');
+    const scrollSpeedRange = document.getElementById('scrollSpeedRange');
+    const scrollSpeedText = document.getElementById('scrollSpeedText');
     const pageUpBtn = document.getElementById('pageUpBtn');
     const pageDownBtn = document.getElementById('pageDownBtn');
 
@@ -383,7 +388,8 @@
       if (!force && now - lastScrollSend < rate) return;
       lastScrollSend = now;
 
-      const scrollPower = Math.round(clamp(-rawDeltaY * 0.45, -8, 8));
+      const scrollSpeed = Number(scrollSpeedRange.value);
+      const scrollPower = Math.round(clamp(-rawDeltaY * 0.45 * scrollSpeed, -80, 80));
       if (scrollPower === 0) return;
 
       scrollVisualOffset = clamp(scrollVisualOffset + rawDeltaY * 0.22, -18, 18);
@@ -472,6 +478,7 @@
     disconnectBtn.addEventListener('click', disconnectMQTT);
     speedRange.addEventListener('input', () => speedText.textContent = speedRange.value);
     rateRange.addEventListener('input', () => rateText.textContent = rateRange.value);
+    scrollSpeedRange.addEventListener('input', () => scrollSpeedText.textContent = scrollSpeedRange.value);
 
     setStatus(false, 'MQTT 未連線');
     log('Device ID: ' + DEVICE_ID);
